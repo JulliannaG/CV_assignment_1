@@ -1,5 +1,5 @@
 import cv2 as cv
-from modules import filters, blur
+from modules import colors, filters, histograms
 
 cap = cv.VideoCapture(0)
 
@@ -7,10 +7,16 @@ if not cap.isOpened():
     print("Cannot open camera")
     exit()
 
-mode = "normal" 
+mode1 = 'normal'
+mode2 = 'colors'
+mode3 = 'filters'
+mode4 = 'geometry'
+
+mode = mode1
 submode = None
 last_submode = None
 window_name = 'Webcam Feed'
+show_hist = False
 
 while True:
     ret, frame = cap.read()
@@ -27,42 +33,47 @@ while True:
         cv.setWindowProperty('Webcam Feed', cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
 
         if submode == "gaussian":
-            blur.init_gaussian_trackbars()
+            filters.init_gaussian_trackbars()
         elif submode == "bilateral":
-            blur.init_bilateral_trackbars()
+            filters.init_bilateral_trackbars()
         elif submode == "brightness":
-            filters.init_cb_trackbars()
+            colors.init_cb_trackbars()
         elif submode == "canny":
             filters.init_canny_trackbars()
     
-    if mode == "normal":
-        frame = filters.normal(frame)
-    if mode == "filters":
+    if mode == mode1:
+        frame = colors.normal(frame)
+    if mode == mode2:
         if submode == "rgb":
-            frame = filters.apply_rgb(frame)
+            frame = colors.apply_rgb(frame)
         elif submode == "hsv":
-            frame = filters.apply_hsv(frame)
+            frame = colors.apply_hsv(frame)
         elif submode == "gray":
-            frame = filters.apply_grayscale(frame)
+            frame = colors.apply_grayscale(frame)
         elif submode == "brightness":
-            frame = filters.apply_contrast_brightness(frame)
+            frame = colors.apply_contrast_brightness(frame)
+    
+    if mode == mode3:
+        if submode == "gaussian":
+            frame = filters.apply_gaussian(frame)
+        elif submode == "bilateral":
+            frame = filters.apply_bilateral(frame)
         elif submode == "canny":
             frame = filters.apply_canny(frame)
-    if mode == "blur":
-        if submode == "gaussian":
-            frame = blur.apply_gaussian(frame)
-        elif submode == "bilateral":
-            frame = blur.apply_bilateral(frame)
 
     last_submode = submode  
 
-    if mode == "normal":
-        menu_text = "[F]ilters [B]lur [P]anorama [G]eometry [A]R [C]alibration [Q]uit"
-    elif mode == "filters":
-        menu_text = "[R]GB [H]SV [G]ray [B]rightness/contrast [C]anny [N]ormal"
-    elif mode == "blur":
-        menu_text = "[G]aussian B[i]lateral [N]ormal"
-    elif mode == "geometry":
+    if mode == mode1:
+        menu_text = "[C]olors [F]ilters [P]anorama [G]eometry [A]R [C]alibration [Q]uit"
+    elif mode == mode2:
+        menu_text = "[R]GB [H]SV [G]ray [B]rightness/contrast [N]ormal"
+        menu2_text = "[O]pen / [C]lose histogram"
+        cv.putText(frame, menu2_text, (10, 30),
+           cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
+
+    elif mode == mode3:
+        menu_text = "[G]aussian B[i]lateral [C]anny [N]ormal"
+    elif mode == mode4:
         menu_text = "[H]ough [T]ranslate [R]otate [S]cale"
 
     cv.putText(frame, menu_text, (10, frame.shape[0]-10),
@@ -73,30 +84,43 @@ while True:
     if key == ord('q'):
         break
     elif key == ord('n'):  
-        mode = "normal"
+        mode = mode1
         submode = None
+
+    elif key == ord('c') and submode == None:
+        mode = mode2 
+        submode = None
+    elif key == ord('r') and mode == mode2:
+        submode = "rgb"
+    elif key == ord('h') and mode == mode2:
+        submode = "hsv"
+    elif key == ord('g') and mode == mode2:
+        submode = "gray"
+    elif key == ord('b') and mode == mode2:
+        submode = "brightness"
 
     elif key == ord('f') and submode == None:
-        mode = "filters" 
+        mode = mode3
         submode = None
-    elif key == ord('r') and mode == "filters":
-        submode = "rgb"
-    elif key == ord('h') and mode == "filters":
-        submode = "hsv"
-    elif key == ord('g') and mode == "filters":
-        submode = "gray"
-    elif key == ord('b') and mode == "filters":
-        submode = "brightness"
-    elif key == ord('c') and mode == "filters":
+    elif key == ord('c') and mode == mode3: #do naprawy -- ten przycisk czasami nie działa!!!
         submode = "canny"
-
-    elif key == ord('b') and submode == None:
-        mode = "blur"
-        submode = None
-    elif key == ord('g') and mode == "blur":
+    elif key == ord('g') and mode == mode3:
         submode = "gaussian"
-    elif key == ord('i') and mode == "blur":
+    elif key == ord('b') and mode == mode3:
         submode = "bilateral"
+
+
+    elif key == ord('o') and submode in ["rgb", "hsv", "brightness", "gray"]:
+        histograms.show_histogram(frame, submode)
+        show_hist = True  
+
+    elif key == ord('c') and show_hist:  
+        cv.destroyWindow("Histogram")
+        show_hist = False
+
+    if show_hist and submode in ["rgb", "hsv", "gray", "brightness"]: 
+        histograms.show_histogram(frame, submode)
+        #do naprawy - histogram zostaje przykryty przez video po zmianie trybu!!!
     
 
 cap.release()
