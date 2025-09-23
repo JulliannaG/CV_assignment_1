@@ -1,5 +1,5 @@
 import cv2 as cv
-from modules import colors, filters, histograms, panorama
+from modules import colors, filters, histograms, geometry, panorama
 
 cap = cv.VideoCapture(0)
 
@@ -45,6 +45,12 @@ while True:
             filters.init_canny_trackbars()
         elif submode == "hough":
             filters.init_hough_trackbars()
+        elif submode == "translation":
+            geometry.init_translation_trackbars()
+        elif submode == "rotation":
+            geometry.init_rotation_trackbars()
+        elif submode == "scaling":
+            geometry.init_scaling_trackbars()
     
     if mode == mode1:
         frame = colors.normal(frame)
@@ -68,6 +74,14 @@ while True:
         elif submode == "hough":
             frame = filters.apply_hough(frame)
 
+    if mode == mode4:
+        if submode == "translation":
+            frame = geometry.apply_translation(frame)
+        elif submode == "rotation":
+            frame = geometry.apply_rotation(frame)
+        elif submode == "scaling":
+            frame = geometry.apply_scaling(frame)
+  
     if mode == mode5:
         if panorama_on ==False:
             cv.putText(frame, "Mode: PANORAMA ('c' to capture, 'r' to reset)", (10,30),
@@ -97,7 +111,7 @@ while True:
     elif mode == mode3:
         menu_text = "[G]aussian B[i]lateral [C]anny [H]ough [N]ormal"
     elif mode == mode4:
-        menu_text = "[T]ranslate [R]otate [S]cale"
+        menu_text = "[T]ranslate [R]otate [S]cale [N]ormal"
 
     cv.putText(frame, menu_text, (10, frame.shape[0]-10),
            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
@@ -133,6 +147,16 @@ while True:
         submode = "bilateral"
     elif key == ord('h') and mode == mode3:
         submode = "hough"
+
+    elif key == ord('g') and mode==mode1 and submode == None:
+        mode = mode4
+        submode = None
+    elif key == ord('t') and mode == mode4:
+        submode = "translation"
+    elif key == ord('r') and mode == mode4:
+        submode = "rotation"
+    elif key == ord('s') and mode == mode4:
+        submode = "scaling"
 
     elif key == ord('p') and mode==mode1 and submode == None:
         mode = mode5
