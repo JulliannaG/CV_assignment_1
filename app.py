@@ -1,5 +1,5 @@
 import cv2 as cv
-from modules import colors, filters, histograms
+from modules import colors, filters, histograms, panorama
 
 cap = cv.VideoCapture(0)
 
@@ -11,12 +11,15 @@ mode1 = 'normal'
 mode2 = 'colors'
 mode3 = 'filters'
 mode4 = 'geometry'
+mode5 = "panorama"
 
 mode = mode1
 submode = None
 last_submode = None
 window_name = 'Webcam Feed'
 show_hist = False
+panorama_builder = panorama.PanoramaBuilder()
+panorama_on = False
 
 while True:
     ret, frame = cap.read()
@@ -65,6 +68,22 @@ while True:
         elif submode == "hough":
             frame = filters.apply_hough(frame)
 
+    if mode == mode5:
+        if panorama_on ==False:
+            cv.putText(frame, "Mode: PANORAMA ('c' to capture, 'r' to reset)", (10,30),
+            cv.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0), 2)
+
+        if key == ord('c'):  
+            panorama = panorama_builder.add_frame(frame)
+            panorama_on = True
+            if panorama is not None:
+                cv.imshow("Panorama", panorama)
+
+        elif key == ord('r'): 
+            panorama_on = False
+            panorama_builder.reset()
+            cv.destroyWindow("Panorama")
+
     last_submode = submode  
 
     if mode == mode1:
@@ -103,7 +122,7 @@ while True:
     elif key == ord('b') and mode == mode2:
         submode = "brightness"
 
-    elif key == ord('f') and submode == None:
+    elif key == ord('f') and mode==mode1 and submode == None:
         mode = mode3
         submode = None
     elif key == ord('c') and mode == mode3:
@@ -114,6 +133,10 @@ while True:
         submode = "bilateral"
     elif key == ord('h') and mode == mode3:
         submode = "hough"
+
+    elif key == ord('p') and mode==mode1 and submode == None:
+        mode = mode5
+        submode = None
 
 
     elif key == ord('o') and submode in ["rgb", "hsv", "brightness", "gray"]:
