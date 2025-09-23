@@ -1,4 +1,5 @@
 import cv2 as cv
+import numpy as np
 
 window_name = "Webcam Feed"
 
@@ -31,8 +32,45 @@ def init_canny_trackbars():
 def apply_canny(frame):
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
 
-    tresh1 = cv.getTrackbarPos("Treshold1", window_name) / 10  
-    tresh2 = cv.getTrackbarPos("Treshold2", window_name) - 50
+    tresh1 = cv.getTrackbarPos("Threshold1", window_name) 
+    tresh2 = cv.getTrackbarPos("Threshold2", window_name) 
 
     final = cv.Canny(gray, threshold1=tresh1, threshold2=tresh2, L2gradient=True)
     return final
+
+def init_hough_trackbars():
+    cv.createTrackbar("Rho", window_name, 3, 5, lambda x: None)
+    cv.createTrackbar("Theta", window_name, 90, 180, lambda x: None) 
+    cv.createTrackbar("Threshold", window_name, 200, 255, lambda x: None) 
+
+def apply_hough(frame):
+    gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+    edges = cv.Canny(gray, 50, 150)   
+
+    rho = cv.getTrackbarPos("Rho", window_name)
+    theta_deg = cv.getTrackbarPos("Theta", window_name)
+    threshold = cv.getTrackbarPos("Threshold", window_name)
+
+    if rho < 1:
+        rho = 1
+    theta = np.deg2rad(max(theta_deg, 1)) 
+
+    lines = cv.HoughLines(edges, rho, theta, threshold)
+
+    if lines is not None:
+        for line in lines:
+            rho, theta = line[0]
+            a = np.cos(theta)
+            b = np.sin(theta)
+            x0 = a * rho
+            y0 = b * rho
+            x1 = int(x0 + 1000 * (-b))
+            y1 = int(y0 + 1000 * (a))
+            x2 = int(x0 - 1000 * (-b))
+            y2 = int(y0 - 1000 * (a))
+            cv.line(frame, (x1, y1), (x2, y2), (0, 0, 255), 2)
+
+    return frame
+
+
+

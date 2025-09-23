@@ -40,6 +40,8 @@ while True:
             colors.init_cb_trackbars()
         elif submode == "canny":
             filters.init_canny_trackbars()
+        elif submode == "hough":
+            filters.init_hough_trackbars()
     
     if mode == mode1:
         frame = colors.normal(frame)
@@ -60,6 +62,8 @@ while True:
             frame = filters.apply_bilateral(frame)
         elif submode == "canny":
             frame = filters.apply_canny(frame)
+        elif submode == "hough":
+            frame = filters.apply_hough(frame)
 
     last_submode = submode  
 
@@ -72,9 +76,9 @@ while True:
            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
 
     elif mode == mode3:
-        menu_text = "[G]aussian B[i]lateral [C]anny [N]ormal"
+        menu_text = "[G]aussian B[i]lateral [C]anny [H]ough [N]ormal"
     elif mode == mode4:
-        menu_text = "[H]ough [T]ranslate [R]otate [S]cale"
+        menu_text = "[T]ranslate [R]otate [S]cale"
 
     cv.putText(frame, menu_text, (10, frame.shape[0]-10),
            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
@@ -87,7 +91,7 @@ while True:
         mode = mode1
         submode = None
 
-    elif key == ord('c') and submode == None:
+    elif key == ord('c') and mode==mode1 and submode == None:
         mode = mode2 
         submode = None
     elif key == ord('r') and mode == mode2:
@@ -102,12 +106,14 @@ while True:
     elif key == ord('f') and submode == None:
         mode = mode3
         submode = None
-    elif key == ord('c') and mode == mode3: #do naprawy -- ten przycisk czasami nie działa!!!
+    elif key == ord('c') and mode == mode3:
         submode = "canny"
     elif key == ord('g') and mode == mode3:
         submode = "gaussian"
     elif key == ord('b') and mode == mode3:
         submode = "bilateral"
+    elif key == ord('h') and mode == mode3:
+        submode = "hough"
 
 
     elif key == ord('o') and submode in ["rgb", "hsv", "brightness", "gray"]:
