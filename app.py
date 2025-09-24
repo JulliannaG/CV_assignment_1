@@ -58,31 +58,49 @@ while True:
 #function call condition  
     if mode == mode1:
         frame = colors.normal(frame)
+
     elif mode == mode2:
         if submode == "rgb":
             frame = colors.apply_rgb(frame)
+            cv.putText(frame, "[O]pen / [C]lose histogram", (10, 30),
+            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
+
         elif submode == "hsv":
             frame = colors.apply_hsv(frame)
+            cv.putText(frame, "[O]pen / [C]lose histogram", (10, 30),
+            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
+
         elif submode == "gray":
             frame = colors.apply_grayscale(frame)
+            cv.putText(frame, "[O]pen / [C]lose histogram", (10, 30),
+            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
+
         elif submode == "brightness":
             frame = colors.apply_contrast_brightness(frame)
+            cv.putText(frame, "[O]pen / [C]lose histogram", (10, 30),
+            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
+
     
     elif mode == mode3:
         if submode == "gaussian":
             frame = filters.apply_gaussian(frame)
+
         elif submode == "bilateral":
             frame = filters.apply_bilateral(frame)
+
         elif submode == "canny":
             frame = filters.apply_canny(frame)
+
         elif submode == "hough":
             frame = filters.apply_hough(frame)
 
     elif mode == mode4:
         if submode == "translation":
             frame = geometry.apply_translation(frame)
+
         elif submode == "rotation":
             frame = geometry.apply_rotation(frame)
+            
         elif submode == "scaling":
             frame = geometry.apply_scaling(frame)
   
@@ -117,15 +135,13 @@ while True:
     if mode == mode1:
         menu_text = "[C]olors [F]ilters [P]anorama [G]eometry [A]R Cal[i]bration [Q]uit"
     elif mode == mode2:
-        menu_text = "[R]GB [H]SV [G]ray [B]rightness/contrast [N]ormal"
-        menu2_text = "[O]pen / [C]lose histogram"
-        cv.putText(frame, menu2_text, (10, 30),
-           cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
-
+        menu_text = "[R]GB [H]SV [G]ray [B]rightness/contrast [N]ormal [Q]uit"
     elif mode == mode3:
-        menu_text = "[G]aussian B[i]lateral [C]anny [H]ough [N]ormal"
+        menu_text = "[G]aussian B[i]lateral [C]anny [H]ough [N]ormal [Q]uit"
     elif mode == mode4:
-        menu_text = "[T]ranslate [R]otate [S]cale [N]ormal"
+        menu_text = "[T]ranslate [R]otate [S]cale [N]ormal [Q]uit"
+    elif mode in [mode5, mode6, mode7]:
+        menu_text = "[N]ormal [Q]uit"
 
     cv.putText(frame, menu_text, (10, frame.shape[0]-10),
            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)

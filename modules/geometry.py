@@ -4,8 +4,8 @@ import numpy as np
 window_name = "Webcam Feed"
 
 def init_translation_trackbars():
-    cv.createTrackbar("tx", window_name, 50, 100, lambda x: None) 
-    cv.createTrackbar("ty", window_name, 50, 100, lambda x: None)
+    cv.createTrackbar("tx", window_name, 300, 600, lambda x: None) 
+    cv.createTrackbar("ty", window_name, 300, 600, lambda x: None)
 
 def init_rotation_trackbars():
     cv.createTrackbar("angle", window_name, 0, 360, lambda x: None) 
@@ -14,8 +14,8 @@ def init_scaling_trackbars():
     cv.createTrackbar("scale", window_name, 10, 30, lambda x: None) 
 
 def apply_translation(frame):
-    tx = cv.getTrackbarPos("tx", window_name) - 50
-    ty = cv.getTrackbarPos("ty", window_name) - 50
+    tx = cv.getTrackbarPos("tx", window_name) - 300
+    ty = cv.getTrackbarPos("ty", window_name) - 300
     M = np.float32([[1, 0, tx],
                     [0, 1, ty]])
     return cv.warpAffine(frame, M, (frame.shape[1], frame.shape[0]))
