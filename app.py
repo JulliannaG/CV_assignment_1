@@ -1,5 +1,5 @@
 import cv2 as cv
-from modules import colors, filters, histograms, geometry, panorama
+from modules import colors, filters, histograms, geometry, panorama, calibration
 
 cap = cv.VideoCapture(0)
 
@@ -12,6 +12,7 @@ mode2 = 'colors'
 mode3 = 'filters'
 mode4 = 'geometry'
 mode5 = "panorama"
+mode6 = "calibration"
 
 mode = mode1
 submode = None
@@ -30,6 +31,7 @@ while True:
         print("Can't receive frame. Exiting ...")
         break
 
+#trackbars conditions
     if submode != last_submode:
         cv.destroyWindow(window_name)
         cv.namedWindow(window_name, cv.WINDOW_NORMAL)
@@ -51,10 +53,11 @@ while True:
             geometry.init_rotation_trackbars()
         elif submode == "scaling":
             geometry.init_scaling_trackbars()
-    
+
+#function call condition  
     if mode == mode1:
         frame = colors.normal(frame)
-    if mode == mode2:
+    elif mode == mode2:
         if submode == "rgb":
             frame = colors.apply_rgb(frame)
         elif submode == "hsv":
@@ -64,7 +67,7 @@ while True:
         elif submode == "brightness":
             frame = colors.apply_contrast_brightness(frame)
     
-    if mode == mode3:
+    elif mode == mode3:
         if submode == "gaussian":
             frame = filters.apply_gaussian(frame)
         elif submode == "bilateral":
@@ -74,7 +77,7 @@ while True:
         elif submode == "hough":
             frame = filters.apply_hough(frame)
 
-    if mode == mode4:
+    elif mode == mode4:
         if submode == "translation":
             frame = geometry.apply_translation(frame)
         elif submode == "rotation":
@@ -82,7 +85,7 @@ while True:
         elif submode == "scaling":
             frame = geometry.apply_scaling(frame)
   
-    if mode == mode5:
+    elif mode == mode5:
         if panorama_on ==False:
             cv.putText(frame, "Mode: PANORAMA ('c' to capture, 'r' to reset)", (10,30),
             cv.FONT_HERSHEY_SIMPLEX, 0.7, (0,255,0), 2)
@@ -98,10 +101,17 @@ while True:
             panorama_builder.reset()
             cv.destroyWindow("Panorama")
 
+    elif mode == mode6:
+        frame, finished = calibration.run_calibration(frame)
+        cv.imshow(window_name, frame)
+        if finished:
+            mode = mode1
+
     last_submode = submode  
 
+#display menu text conditions
     if mode == mode1:
-        menu_text = "[C]olors [F]ilters [P]anorama [G]eometry [A]R [C]alibration [Q]uit"
+        menu_text = "[C]olors [F]ilters [P]anorama [G]eometry [A]R Cal[i]bration [Q]uit"
     elif mode == mode2:
         menu_text = "[R]GB [H]SV [G]ray [B]rightness/contrast [N]ormal"
         menu2_text = "[O]pen / [C]lose histogram"
@@ -117,6 +127,7 @@ while True:
            cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
     cv.imshow(window_name, frame)
 
+#keys conditions
     key = cv.waitKey(1) & 0xFF
     if key == ord('q'):
         break
@@ -160,6 +171,10 @@ while True:
 
     elif key == ord('p') and mode==mode1 and submode == None:
         mode = mode5
+        submode = None
+
+    elif key == ord('i') and mode==mode1 and submode == None:
+        mode = mode6
         submode = None
 
 
