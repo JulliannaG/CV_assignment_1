@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import os
+import math
 
 def draw_text(frame, text, pos=(20, 50), scale=1.0, color=(255, 255, 255)):
     """Draw text with black outline for visibility."""
@@ -34,8 +35,71 @@ def estimatePoseSingleMarkers(corners, marker_size, mtx, distortion):
         trash.append(nada)
     return rvecs, tvecs, trash
 
+def load_obj(filename):
+    vertices = []
+    faces = []
+    with open(filename, 'r') as f:
+        for line in f:
+            if line.startswith('v '):
+                _, x, y, z = line.strip().split()
+                vertices.append([float(x), float(y), float(z)])
+            elif line.startswith('f '):
+                parts = line.strip().split()[1:]
+                face = [int(p.split('/')[0]) - 1 for p in parts]
+                faces.append(face)
 
-# --- AR Module State ---
+    verts = np.array(vertices, dtype=np.float32)
+
+    #Normalization - too many poligons in .obj file
+    verts -= np.mean(verts, axis=0)     
+    scale = np.max(np.linalg.norm(verts, axis=1))  
+    verts /= scale                       
+
+    return verts, faces
+
+def rotate_y(vertices, angle_deg):
+    a = math.radians(angle_deg)
+    R = np.array([[ math.cos(a), 0, math.sin(a)],
+                  [0,            1, 0          ],
+                  [-math.sin(a), 0, math.cos(a)]], dtype=np.float32)
+    return vertices @ R.T
+
+
+def process_frame(frame):
+    """Process single frame in AR mode: detect ArUco and draw 3D model (T-Rex)."""
+    draw_text(frame, "Mode: AUGMENTED REALITY")
+
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    corners, ids, _ = aruco_detector.detectMarkers(gray)
+
+    if ids is not None:
+        rvecs, tvecs, _ = estimatePoseSingleMarkers(corners, 0.05, mtx, dist)
+
+        if model_vertices is not None and len(model_vertices) > 0:
+         
+            scale = 0.3  
+            verts = rotate_y(model_vertices, 85)
+            offset = np.array([0.03, 0.05, 0])  # [X, Y, Z]
+            verts = verts * scale + offset
+
+            img_pts, _ = cv2.projectPoints(verts, rvecs[0], tvecs[0], mtx, dist)
+            img_pts = np.int32(img_pts).reshape(-1, 2)
+
+            for face in model_faces:
+                pts = img_pts[face]
+                cv2.fillConvexPoly(frame, pts, (100, 200, 100), lineType=cv2.LINE_AA)
+                cv2.polylines(frame, [pts], True, (0, 0, 0), 1, lineType=cv2.LINE_AA)
+        else:
+            draw_text(frame, "Model not loaded", pos=(20, 80), color=(0, 0, 255))
+    else:
+        draw_text(frame, "No ArUco markers detected", pos=(20, 80), color=(0, 0, 255))
+
+    return frame
+
+
+# AR
+model_vertices, model_faces = load_obj("modules/trex_model.obj")
+
 aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_6X6_250)
 aruco_params = cv2.aruco.DetectorParameters()
 aruco_detector = cv2.aruco.ArucoDetector(aruco_dict, aruco_params)
@@ -51,42 +115,3 @@ else:
     print("WARNING: 'calibration.npz' not found. AR may be inaccurate.")
 
 
-def process_frame(frame):
-    """Process single frame in AR mode: detect ArUco and draw cube."""
-    draw_text(frame, "Mode: AUGMENTED REALITY")
-
-    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    corners, ids, _ = aruco_detector.detectMarkers(gray)
-
-    if ids is not None:
-        rvecs, tvecs, _ = estimatePoseSingleMarkers(corners, 0.05, mtx, dist)
-
-        axis_len = 0.05
-        obj_pts = np.float32([
-            [0,0,0], [axis_len,0,0], [axis_len,axis_len,0], [0,axis_len,0],
-            [0,0,-axis_len], [axis_len,0,-axis_len], [axis_len,axis_len,-axis_len], [0,axis_len,-axis_len]
-        ])
-        img_pts, _ = cv2.projectPoints(obj_pts, rvecs[0], tvecs[0], mtx, dist)
-        img_pts = np.int32(img_pts).reshape(-1, 2)
-
-        faces = [
-            [0, 1, 2, 3],  # bottom
-            [4, 5, 6, 7],  # top
-            [0, 1, 5, 4],
-            [1, 2, 6, 5],
-            [2, 3, 7, 6],
-            [3, 0, 4, 7],
-        ]
-        face_colors = [
-            (255, 0, 0), (0, 255, 0), (0, 0, 255),
-            (255, 255, 0), (255, 0, 255), (0, 255, 255)
-        ]
-
-        for idx, face in enumerate(faces):
-            cv2.fillConvexPoly(frame, img_pts[face], face_colors[idx], lineType=cv2.LINE_AA)
-        for face in faces:
-            cv2.polylines(frame, [img_pts[face]], True, (0,0,0), 2, lineType=cv2.LINE_AA)
-    else:
-        draw_text(frame, "No ArUco markers detected", pos=(20, 80), color=(0, 0, 255))
-
-    return frame
