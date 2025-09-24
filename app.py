@@ -133,7 +133,7 @@ while True:
 
 #display menu text conditions
     if mode == mode1:
-        menu_text = "[C]olors [F]ilters [P]anorama [G]eometry [A]R Cal[i]bration [Q]uit"
+        menu_text = "[C]olors [F]ilters [G]eometry [P]anorama Cal[i]brate [A]R [Q]uit"
     elif mode == mode2:
         menu_text = "[R]GB [H]SV [G]ray [B]rightness/contrast [N]ormal [Q]uit"
     elif mode == mode3:
