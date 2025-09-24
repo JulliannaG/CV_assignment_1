@@ -1,5 +1,5 @@
 import cv2 as cv
-from modules import colors, filters, histograms, geometry, panorama, calibration
+from modules import colors, filters, histograms, geometry, panorama, calibration, ar
 
 cap = cv.VideoCapture(0)
 
@@ -13,6 +13,7 @@ mode3 = 'filters'
 mode4 = 'geometry'
 mode5 = "panorama"
 mode6 = "calibration"
+mode7 = "ar"
 
 mode = mode1
 submode = None
@@ -107,6 +108,9 @@ while True:
         if finished:
             mode = mode1
 
+    elif mode == mode7:
+        ar.process_frame(frame)
+
     last_submode = submode  
 
 #display menu text conditions
@@ -175,6 +179,10 @@ while True:
 
     elif key == ord('i') and mode==mode1 and submode == None:
         mode = mode6
+        submode = None
+
+    elif key == ord('a') and mode==mode1 and submode == None:
+        mode = mode7
         submode = None
 
 
