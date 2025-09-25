@@ -5,12 +5,19 @@ def show_histogram(frame, submode):
     hists = []
 
     if submode == "rgb":
-        colors = ('b','g','r')
+        # jeśli obraz jest 1-kanałowy, zamień na 3 kanały
+        if len(frame.shape) == 2:
+            frame = cv.cvtColor(frame, cv.COLOR_GRAY2BGR)
+
+        colors = ('b', 'g', 'r')
         for i, col in enumerate(colors):
             hist = cv.calcHist([frame], [i], None, [256], [0, 256])
             hists.append((hist, col))
 
     elif submode == "hsv":
+        if len(frame.shape) == 2:  
+            frame = cv.cvtColor(frame, cv.COLOR_GRAY2BGR)
+
         hsv = cv.cvtColor(frame, cv.COLOR_BGR2HSV)
         colors = ('m','c','y')  
         for i, col in enumerate(colors):
@@ -18,11 +25,17 @@ def show_histogram(frame, submode):
             hists.append((hist, col))
 
     elif submode == "gray":
-        gray = frame
+        if len(frame.shape) == 3:  
+            gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)
+        else:
+            gray = frame
         hist = cv.calcHist([gray], [0], None, [256], [0, 256])
         hists.append((hist, 'w'))
 
     elif submode == "brightness":
+        if len(frame.shape) == 2:
+            frame = cv.cvtColor(frame, cv.COLOR_GRAY2BGR)
+
         ycrcb = cv.cvtColor(frame, cv.COLOR_BGR2YCrCb)
         hist = cv.calcHist([ycrcb], [0], None, [256], [0, 256])
         hists.append((hist, 'w'))
@@ -48,6 +61,3 @@ def show_histogram(frame, submode):
             cv.line(hist_img, (x, 300), (x, 300 - int(y)), color, 1)
 
     cv.imshow("Histogram", hist_img)
-
-
-

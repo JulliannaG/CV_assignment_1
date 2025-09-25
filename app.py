@@ -115,7 +115,7 @@ while True:
             if panorama is not None:
                 cv.imshow("Panorama", panorama)
 
-        elif key == ord('r'): 
+        elif key == ord('r') or cv.getWindowProperty("Panorama", cv.WND_PROP_VISIBLE) < 1:
             panorama_on = False
             panorama_builder.reset()
             cv.destroyWindow("Panorama")
@@ -123,7 +123,8 @@ while True:
     elif mode == mode6:
         frame, finished = calibration.run_calibration(frame)
         cv.imshow(window_name, frame)
-        if finished:
+        if finished and (key == ord('c') or cv.getWindowProperty("Calibration Results", cv.WND_PROP_VISIBLE) < 1):
+            cv.destroyWindow("Calibration Results")
             mode = mode1
 
     elif mode == mode7:
@@ -206,7 +207,7 @@ while True:
         histograms.show_histogram(frame, submode)
         show_hist = True  
 
-    elif key == ord('c') and show_hist:  
+    elif (key == ord('c') or cv.getWindowProperty("Histogram", cv.WND_PROP_VISIBLE) < 1) and show_hist: 
         cv.destroyWindow("Histogram")
         show_hist = False
 

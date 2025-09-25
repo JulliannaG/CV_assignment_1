@@ -78,6 +78,9 @@ def run_calibration(frame, reset=False):
             cv2.putText(result_img, text, (60, y),
                         cv2.FONT_HERSHEY_SIMPLEX, 0.6, (200, 200, 200), 1)
             
+            cv2.putText(result_img, "Press 'c' or close window to exit", (50, 370),
+            cv2.FONT_HERSHEY_SIMPLEX, 0.6, (100, 255, 255), 1)
+
             cv2.imshow("Calibration Results", result_img)
 
             done = True
