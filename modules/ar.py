@@ -92,13 +92,15 @@ def process_frame(frame):
 
         if model_vertices is not None and len(model_vertices) > 0:
          
-            scale = 0.55
+            scale = 0.5
             verts = model_vertices.copy()
             verts = rotate_x(verts, 90)
             verts = rotate_z(verts, 90)
             verts = verts * scale 
 
             img_pts, _ = cv2.projectPoints(verts, rvecs[0], tvecs[0], mtx, dist)
+            if img_pts is None or not np.all(np.isfinite(img_pts)):
+                return frame
             
             img_pts = np.int32(img_pts).reshape(-1, 2)
 

@@ -148,8 +148,14 @@ def run():
         elif mode in [mode5, mode6, mode7]:
             menu_text = "[N]ormal [Q]uit"
 
-        cv.putText(frame, menu_text, (10, frame.shape[0]-10),
+        
+        if len(frame.shape) == 2:
+            cv.putText(frame, menu_text, (10, frame.shape[0]-10),
+            cv.FONT_HERSHEY_SIMPLEX, 0.6, (255,255,255), 2)
+        else:
+            cv.putText(frame, menu_text, (10, frame.shape[0]-10),
             cv.FONT_HERSHEY_SIMPLEX, 0.6, (0,255,0), 2)
+
         cv.imshow(window_name, frame)
 
     #keys conditions
