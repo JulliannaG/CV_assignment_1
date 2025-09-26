@@ -1,17 +1,17 @@
 # CV_assignment_1
 
-__Environment setup:__
+__Environment setup:__     
 Create virtual environment using 'uv venv --python 3.12' command. 
 Use 'source .venv/bin/activate' to activate virtual environment.
 
 All packages with their versions are listed in 'requirements.txt' file.
 
-__How to run application:__
+__How to run application:__     
 Application can be started by running 'main.py' script. 
 The main framework of the application is located in 'app.py' file.
 'Modules' folder contains all implemented application functions.
 
-__Functions:__
+__Functions:__     
 After running application, the webcam feed will be displayed in full screen. At the bottom of the window there is displayed a menu with all possible modes:
 
 * Normal - this is the initial mode, which can be also entered by pressing '__n__' key. This mode is essential to switch between different modes (going back from submode menu to mode menu). You can switch between specific groups of submodes only when being in correct mode.
