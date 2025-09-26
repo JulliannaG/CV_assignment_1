@@ -16,8 +16,8 @@ def apply_gaussian(frame):
 
 def init_bilateral_trackbars():
     cv.createTrackbar("d", window_name, 9, 20, lambda x: None)
-    cv.createTrackbar("sigmaColor", window_name, 75, 250, lambda x: None)
-    cv.createTrackbar("sigmaSpace", window_name, 75, 250, lambda x: None)
+    cv.createTrackbar("sigmaColor", window_name, 50, 250, lambda x: None)
+    cv.createTrackbar("sigmaSpace", window_name, 150, 250, lambda x: None)
 
 def apply_bilateral(frame):
     d = cv.getTrackbarPos("d", window_name)
@@ -26,8 +26,8 @@ def apply_bilateral(frame):
     return cv.bilateralFilter(frame, d, sigmaColor, sigmaSpace)
 
 def init_canny_trackbars():
-    cv.createTrackbar("Threshold1", window_name, 50, 255, lambda x: None)
-    cv.createTrackbar("Threshold2", window_name, 150, 255, lambda x: None) 
+    cv.createTrackbar("Threshold1", window_name, 30, 250, lambda x: None)
+    cv.createTrackbar("Threshold2", window_name, 10, 250, lambda x: None) 
 
 def apply_canny(frame):
     gray = cv.cvtColor(frame, cv.COLOR_BGR2GRAY)

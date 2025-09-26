@@ -45,11 +45,6 @@ class PanoramaBuilder:
                 dst_pts = np.float32([kp2[m.trainIdx].pt for m in good]).reshape(-1,2)
                 dx = int(np.mean(dst_pts[:,0] - src_pts[:,0]))
 
-        dx = int(dx * self.overshoot)
-        min_dx = 7
-        if abs(dx) < min_dx:
-            dx = 0
-
         pano_h, pano_w = self.panorama.shape[:2]
 
         # adding panorama to the right side

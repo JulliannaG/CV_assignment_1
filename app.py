@@ -125,8 +125,10 @@ def run():
         elif mode == mode6:
             frame, finished = calibration.run_calibration(frame)
             cv.imshow(window_name, frame)
+            key = cv.waitKey(1) & 0xFF
             if finished and (key == ord('c') or cv.getWindowProperty("Calibration Results", cv.WND_PROP_VISIBLE) < 1):
                 cv.destroyWindow("Calibration Results")
+                calibration.run_calibration(frame, reset=True)  
                 mode = mode1
 
         elif mode == mode7:
