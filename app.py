@@ -26,6 +26,7 @@ def run():
 
     while True:
         ret, frame = cap.read()
+        key = cv.waitKey(1) & 0xFF
         cv.namedWindow(window_name, cv.WINDOW_NORMAL)
         cv.setWindowProperty('Webcam Feed', cv.WND_PROP_FULLSCREEN, cv.WINDOW_FULLSCREEN)
 
@@ -125,10 +126,10 @@ def run():
         elif mode == mode6:
             frame, finished = calibration.run_calibration(frame)
             cv.imshow(window_name, frame)
-            key = cv.waitKey(1) & 0xFF
             if finished and (key == ord('c') or cv.getWindowProperty("Calibration Results", cv.WND_PROP_VISIBLE) < 1):
                 cv.destroyWindow("Calibration Results")
-                calibration.run_calibration(frame, reset=True)  
+                calibration.run_calibration(frame, reset=True) 
+                key = 0 
                 mode = mode1
 
         elif mode == mode7:
@@ -159,7 +160,6 @@ def run():
         cv.imshow(window_name, frame)
 
     #keys conditions
-        key = cv.waitKey(1) & 0xFF
         if key == ord('q'):
             break
         elif key == ord('n'):  
