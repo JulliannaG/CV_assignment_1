@@ -1,12 +1,12 @@
 # CV_assignment_1
 
-__Installation and setup:__
+__Environment and dependencies:__
 For this assignment I used python virtual environment and created .venv folder using 'uv venv --python 3.12'. All packages are listed in 'requirements.txt' file.
 Application can be open by running 'main.py' script. 
-The min framework of the application is located in 'app.py' file.
+The main framework of the application is located in 'app.py' file.
 'Modules' folder contains all implemented application functions.
 
-__How to use application:__
+__Functions:__
 After running application, the webcam feed will be displayed in full screen. At the bottom of the window there is displayed a menu with all possible modes:
 * Normal - this is the initial mode, which can be also enered by pressing 'n' key. This mode is essential to switch between different modes (go back from submode menu to mode menu).
 
@@ -35,5 +35,6 @@ After running application, the webcam feed will be displayed in full screen. At 
 These parameters are saved to 'calibration.npz' file. then used to correct image distortion, which improves accuracy for tasks like augmented reality or 3D reconstruction.
 
 * AR - this mode can be enter by pressing 'a' key. The system detects ArUco markers in the camera feed ('A4_ArUco_Marker.png') and uses the previously obtained calibration parameters from 'calibration.npz' file to estimate their 3D position and orientation. Without this file the AR moght not work correctly. Based on this, it overlays virtual 3D dinosaur object on top of the detected markers, so they appear anchored in the real world and follow the marker’s movement.
+The trex has been placed so that his legs are coming out of the marker. When marker is fliped upside down or positioned at odd angles, the apllication might crash.
 
 The application can be quit by pressing 'q' key from every level of application.

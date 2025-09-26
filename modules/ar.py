@@ -57,11 +57,26 @@ def load_obj(filename):
 
     return verts, faces
 
+def rotate_x(vertices, angle_deg):
+    a = math.radians(angle_deg)
+    R = np.array([[1, 0, 0],
+                   [0, np.cos(a), -np.sin(a)],
+                   [0, np.sin(a),  np.cos(a)]], dtype=np.float32)
+
+    return vertices @ R.T
+
 def rotate_y(vertices, angle_deg):
     a = math.radians(angle_deg)
     R = np.array([[ math.cos(a), 0, math.sin(a)],
                   [0,            1, 0          ],
                   [-math.sin(a), 0, math.cos(a)]], dtype=np.float32)
+    return vertices @ R.T
+
+def rotate_z(vertices, angle_deg):
+    a = math.radians(angle_deg)
+    R = np.array([[np.cos(a), -np.sin(a), 0],
+                   [np.sin(a),  np.cos(a), 0],
+                   [0, 0, 1]], dtype=np.float32)
     return vertices @ R.T
 
 
@@ -77,12 +92,14 @@ def process_frame(frame):
 
         if model_vertices is not None and len(model_vertices) > 0:
          
-            scale = 0.3  
-            verts = rotate_y(model_vertices, 85)
-            offset = np.array([0.03, 0.05, 0])  # [X, Y, Z]
-            verts = verts * scale + offset
+            scale = 0.55
+            verts = model_vertices.copy()
+            verts = rotate_x(verts, 90)
+            verts = rotate_z(verts, 90)
+            verts = verts * scale 
 
             img_pts, _ = cv2.projectPoints(verts, rvecs[0], tvecs[0], mtx, dist)
+            
             img_pts = np.int32(img_pts).reshape(-1, 2)
 
             for face in model_faces:
@@ -113,5 +130,3 @@ if os.path.exists('calibration.npz'):
     print("Calibration data loaded for AR.")
 else:
     print("WARNING: 'calibration.npz' not found. AR may be inaccurate.")
-
-
